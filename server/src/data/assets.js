@@ -1,0 +1,5 @@
+export let assets = [
+  { id: 'AST-0001', type: 'Laptop', manufacturer: 'Dell', model: 'Latitude 5440', serialNumber: 'DL5440-0091', os: 'Windows 11', assignedUser: 'Sara Al Otaibi', department: 'Finance', location: 'Dammam', status: 'Active', purchaseDate: '2023-04-12', warrantyExpiry: '2026-04-12', notes: '' },
+  { id: 'AST-0002', type: 'Desktop', manufacturer: 'Dell', model: 'OptiPlex 7010', serialNumber: 'DOP7010-0044', os: 'Windows 11', assignedUser: 'Faisal Al Harbi', department: 'IT', location: 'Khobar', status: 'Active', purchaseDate: '2022-11-03', warrantyExpiry: '2025-11-03', notes: '' },
+  { id: 'AST-0003', type: 'Laptop', manufacturer: 'HP', model: 'ProBook 450', serialNumber: 'HPPB450-0123', os: 'Windows 10', assignedUser: 'Unassigned', department: '', location: 'Jubail', status: 'Available', purchaseDate: '2024-01-20', warrantyExpiry: '2027-01-20', notes: '' },
+]

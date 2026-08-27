@@ -1,0 +1,4 @@
+export let tickets = [
+  { id: 'TCK-1042', title: 'Laptop wont boot after update', description: 'Device stuck on blue screen after Windows update.', requester: 'Sara Al Otaibi', asset: 'AST-0001', location: 'Dammam', category: 'Hardware', priority: 'High', status: 'Open', technician: 'Unassigned', createdDate: '2026-08-20', resolution: '' },
+  { id: 'TCK-1041', title: 'Printer offline in Khobar office', description: 'Printer shows offline status.', requester: 'Faisal Al Harbi', asset: 'AST-0002', location: 'Khobar', category: 'Printer', priority: 'Medium', status: 'In Progress', technician: 'Omar Al Zahrani', createdDate: '2026-08-19', resolution: '' },
+]
