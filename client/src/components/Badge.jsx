@@ -8,6 +8,9 @@ const colorMap = {
   Medium: 'bg-yellow-100 text-yellow-700',
   High: 'bg-orange-100 text-orange-700',
   Critical: 'bg-red-100 text-red-700',
+  Admin: 'bg-red-100 text-red-700',
+  'IT Technician': 'bg-blue-100 text-blue-700',
+  Employee: 'bg-gray-100 text-gray-600',
 }
 
 function Badge({ children }) {
