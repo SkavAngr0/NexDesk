@@ -1,16 +1,36 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import Badge from '../components/Badge'
-import { users } from '../data/mockUsers'
+import { getAllUsers } from '../services/userService'
 
 function Users() {
+  const [users, setUsers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        const data = await getAllUsers()
+        setUsers(data)
+      } catch (err) {
+        setError('Failed to load users. Is the backend server running?')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadUsers()
+  }, [])
 
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.department.toLowerCase().includes(searchTerm.toLowerCase())
+      (user.department || '').toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  if (loading) return <p className="text-gray-500">Loading users...</p>
+  if (error) return <p className="text-red-600">{error}</p>
 
   return (
     <div>
@@ -31,28 +51,26 @@ function Users() {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-gray-500">
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Department</th>
-                <th className="px-4 py-3 font-medium">Job Title</th>
-                <th className="px-4 py-3 font-medium">Country</th>
-                <th className="px-4 py-3 font-medium">Location</th>
-                <th className="px-4 py-3 font-medium">Role</th>
+              <th className="px-4 py-3 font-medium">Employee ID</th>
+              <th className="px-4 py-3 font-medium">Name</th>
+              <th className="px-4 py-3 font-medium">Email</th>
+              <th className="px-4 py-3 font-medium">Department</th>
+              <th className="px-4 py-3 font-medium">Job Title</th>
+              <th className="px-4 py-3 font-medium">Role</th>
             </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
+          </thead>
+          <tbody className="divide-y divide-gray-100">
             {filteredUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-900">{user.name}</td>
+              <tr key={user.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3 font-medium text-gray-900">{user.employeeId}</td>
+                <td className="px-4 py-3 text-gray-600">{user.name}</td>
                 <td className="px-4 py-3 text-gray-600">{user.email}</td>
                 <td className="px-4 py-3 text-gray-600">{user.department}</td>
                 <td className="px-4 py-3 text-gray-600">{user.jobTitle}</td>
-                <td className="px-4 py-3 text-gray-600">{user.country}</td>
-                <td className="px-4 py-3 text-gray-600">{user.location}</td>
                 <td className="px-4 py-3"><Badge>{user.role}</Badge></td>
-                </tr>
+              </tr>
             ))}
-            </tbody>
+          </tbody>
         </table>
 
         {filteredUsers.length === 0 && (

@@ -1,17 +1,38 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
-import { articles, kbCategories } from '../data/mockKnowledgeBase'
+import { getAllArticles } from '../services/knowledgeService'
+import { kbCategories } from '../data/kbOptions'
 
 function KnowledgeBase() {
+  const [articles, setArticles] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('All')
+
+  useEffect(() => {
+    async function loadArticles() {
+      try {
+        const data = await getAllArticles()
+        setArticles(data)
+      } catch (err) {
+        setError('Failed to load articles. Is the backend server running?')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadArticles()
+  }, [])
 
   const filteredArticles = articles.filter((article) => {
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesCategory = categoryFilter === 'All' || article.category === categoryFilter
     return matchesSearch && matchesCategory
   })
+
+  if (loading) return <p className="text-gray-500">Loading articles...</p>
+  if (error) return <p className="text-red-600">{error}</p>
 
   return (
     <div>
@@ -32,7 +53,7 @@ function KnowledgeBase() {
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-gray-300 rounded-lg text-sm px-3 py-2"
         >
           <option value="All">All Categories</option>
           {kbCategories.map((cat) => (
@@ -53,7 +74,7 @@ function KnowledgeBase() {
             </span>
             <h2 className="font-semibold text-gray-900 mb-2">{article.title}</h2>
             <p className="text-sm text-gray-500 line-clamp-2">{article.problem}</p>
-            <p className="text-xs text-gray-400 mt-3">Updated {article.lastUpdated}</p>
+            <p className="text-xs text-gray-400 mt-3">By {article.author.name}</p>
           </Link>
         ))}
       </div>

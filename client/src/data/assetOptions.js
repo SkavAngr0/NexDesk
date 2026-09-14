@@ -1,0 +1,2 @@
+export const assetTypes = ['Laptop', 'Desktop', 'Monitor', 'Printer', 'Scanner', 'Docking Station', 'Network Equipment', 'Other']
+export const assetStatuses = ['Active', 'Available', 'Under Repair', 'Retired', 'Lost']

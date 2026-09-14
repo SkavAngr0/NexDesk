@@ -1,15 +1,34 @@
+import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
-import { articles } from '../data/mockKnowledgeBase'
+import { getArticleById } from '../services/knowledgeService'
 
 function ArticleDetail() {
   const { articleId } = useParams()
-  const article = articles.find((a) => a.id === articleId)
+  const [article, setArticle] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  if (!article) {
+  useEffect(() => {
+    async function loadArticle() {
+      try {
+        const data = await getArticleById(articleId)
+        setArticle(data)
+      } catch (err) {
+        setError('Article not found.')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadArticle()
+  }, [articleId])
+
+  if (loading) return <p className="text-gray-500">Loading article...</p>
+
+  if (error || !article) {
     return (
       <div>
-        <p className="text-gray-500">Article not found.</p>
+        <p className="text-gray-500">{error || 'Article not found.'}</p>
         <Link to="/knowledge-base" className="text-blue-600 text-sm font-medium">
           Back to Knowledge Base
         </Link>
@@ -29,7 +48,7 @@ function ArticleDetail() {
           {article.category}
         </span>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">{article.title}</h1>
-        <p className="text-xs text-gray-400 mb-6">By {article.author} • Updated {article.lastUpdated}</p>
+        <p className="text-xs text-gray-400 mb-6">By {article.author.name}</p>
 
         <h2 className="font-semibold text-gray-900 mb-2">Problem</h2>
         <p className="text-sm text-gray-600 mb-6">{article.problem}</p>

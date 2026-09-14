@@ -1,0 +1,1 @@
+export const kbCategories = ['Hardware', 'Software', 'Network', 'Printer', 'Account Access', 'Email', 'Other']
