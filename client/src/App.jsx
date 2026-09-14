@@ -7,6 +7,7 @@ import KnowledgeBase from './pages/KnowledgeBase'
 import Users from './pages/Users'
 import Locations from './pages/Locations'
 import ArticleDetail from './pages/ArticleDetail'
+import NotFound from './pages/NotFound'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/locations" element={<Locations />} />
           <Route path="/knowledge-base/:articleId" element={<ArticleDetail />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </MainLayout>
     </BrowserRouter>

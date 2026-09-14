@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import Skeleton from '../components/Skeleton'
+import ErrorState from '../components/ErrorState'
 import { getArticleById } from '../services/knowledgeService'
 
 function ArticleDetail() {
@@ -10,25 +12,35 @@ function ArticleDetail() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    async function loadArticle() {
-      try {
-        const data = await getArticleById(articleId)
-        setArticle(data)
-      } catch (err) {
-        setError('Article not found.')
-      } finally {
-        setLoading(false)
-      }
-    }
     loadArticle()
   }, [articleId])
 
-  if (loading) return <p className="text-gray-500">Loading article...</p>
+  async function loadArticle() {
+    try {
+      setLoading(true)
+      const data = await getArticleById(articleId)
+      setArticle(data)
+      setError(null)
+    } catch (err) {
+      setError('Article not found.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <Skeleton className="h-5 w-40 mb-4" />
+        <Skeleton className="h-64 rounded-xl" />
+      </div>
+    )
+  }
 
   if (error || !article) {
     return (
       <div>
-        <p className="text-gray-500">{error || 'Article not found.'}</p>
+        <p className="text-gray-500 mb-2">{error || 'Article not found.'}</p>
         <Link to="/knowledge-base" className="text-blue-600 text-sm font-medium">
           Back to Knowledge Base
         </Link>

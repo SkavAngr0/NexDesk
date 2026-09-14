@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Laptop, CheckCircle2, Wrench, PackageCheck, Ticket, TrendingUp } from 'lucide-react'
 import StatCard from '../components/StatCard'
 import Badge from '../components/Badge'
+import Skeleton from '../components/Skeleton'
+import ErrorState from '../components/ErrorState'
 import { getDashboardStats } from '../services/dashboardService'
 
 function Dashboard() {
@@ -10,26 +12,38 @@ function Dashboard() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    async function loadStats() {
-      try {
-        const data = await getDashboardStats()
-        setStats(data)
-      } catch (err) {
-        setError('Failed to load dashboard data. Is the backend server running?')
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadStats()
   }, [])
 
+  async function loadStats() {
+    try {
+      setLoading(true)
+      const data = await getDashboardStats()
+      setStats(data)
+      setError(null)
+    } catch (err) {
+      setError('Failed to load dashboard data. Is the backend server running?')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (loading) {
-    return <p className="text-gray-500">Loading dashboard...</p>
+    return (
+      <div>
+        <Skeleton className="h-8 w-48 mb-6" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 rounded-xl" />
+          ))}
+        </div>
+        <Skeleton className="h-64 rounded-xl" />
+      </div>
+    )
   }
 
   if (error) {
-    return <p className="text-red-600">{error}</p>
+    return <ErrorState message={error} onRetry={loadStats} />
   }
 
   return (

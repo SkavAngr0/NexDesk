@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Search } from 'lucide-react'
+import Skeleton from '../components/Skeleton'
+import ErrorState from '../components/ErrorState'
 import { getAllArticles } from '../services/knowledgeService'
 import { kbCategories } from '../data/kbOptions'
 
@@ -12,18 +14,21 @@ function KnowledgeBase() {
   const [categoryFilter, setCategoryFilter] = useState('All')
 
   useEffect(() => {
-    async function loadArticles() {
-      try {
-        const data = await getAllArticles()
-        setArticles(data)
-      } catch (err) {
-        setError('Failed to load articles. Is the backend server running?')
-      } finally {
-        setLoading(false)
-      }
-    }
     loadArticles()
   }, [])
+
+  async function loadArticles() {
+    try {
+      setLoading(true)
+      const data = await getAllArticles()
+      setArticles(data)
+      setError(null)
+    } catch (err) {
+      setError('Failed to load articles. Is the backend server running?')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filteredArticles = articles.filter((article) => {
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -31,8 +36,23 @@ function KnowledgeBase() {
     return matchesSearch && matchesCategory
   })
 
-  if (loading) return <p className="text-gray-500">Loading articles...</p>
-  if (error) return <p className="text-red-600">{error}</p>
+  if (loading) {
+    return (
+      <div>
+        <Skeleton className="h-8 w-48 mb-6" />
+        <Skeleton className="h-10 w-full mb-6" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-32 rounded-xl" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={loadArticles} />
+  }
 
   return (
     <div>

@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Search, Plus, Pencil, Trash2 } from 'lucide-react'
+import { Search, Plus, Trash2 } from 'lucide-react'
 import Badge from '../components/Badge'
 import Modal from '../components/Modal'
 import TicketForm from '../components/TicketForm'
+import Skeleton from '../components/Skeleton'
+import ErrorState from '../components/ErrorState'
 import { getAllTickets, createTicket, updateTicket, deleteTicket } from '../services/ticketService'
 import { ticketPriorities, ticketStatuses } from '../data/ticketOptions'
 
@@ -16,7 +18,6 @@ function Tickets() {
   const [statusFilter, setStatusFilter] = useState('All')
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingTicket, setEditingTicket] = useState(null)
 
   useEffect(() => {
     loadTickets()
@@ -36,7 +37,6 @@ function Tickets() {
   }
 
   function openAddModal() {
-    setEditingTicket(null)
     setIsModalOpen(true)
   }
 
@@ -81,8 +81,23 @@ function Tickets() {
     return matchesSearch && matchesPriority && matchesStatus
   })
 
-  if (loading) return <p className="text-gray-500">Loading tickets...</p>
-  if (error) return <p className="text-red-600">{error}</p>
+  if (loading) {
+    return (
+      <div>
+        <Skeleton className="h-8 w-32 mb-6" />
+        <Skeleton className="h-10 w-full mb-4" />
+        <div className="space-y-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 rounded-lg" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={loadTickets} />
+  }
 
   return (
     <div>

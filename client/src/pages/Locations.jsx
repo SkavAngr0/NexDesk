@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { MapPin, Laptop, Ticket } from 'lucide-react'
+import Skeleton from '../components/Skeleton'
+import ErrorState from '../components/ErrorState'
 import { getAllLocations } from '../services/locationService'
 
 function Locations() {
@@ -8,21 +10,38 @@ function Locations() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    async function loadLocations() {
-      try {
-        const data = await getAllLocations()
-        setLocations(data)
-      } catch (err) {
-        setError('Failed to load locations. Is the backend server running?')
-      } finally {
-        setLoading(false)
-      }
-    }
     loadLocations()
   }, [])
 
-  if (loading) return <p className="text-gray-500">Loading locations...</p>
-  if (error) return <p className="text-red-600">{error}</p>
+  async function loadLocations() {
+    try {
+      setLoading(true)
+      const data = await getAllLocations()
+      setLocations(data)
+      setError(null)
+    } catch (err) {
+      setError('Failed to load locations. Is the backend server running?')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div>
+        <Skeleton className="h-8 w-32 mb-6" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-28 rounded-xl" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={loadLocations} />
+  }
 
   return (
     <div>
