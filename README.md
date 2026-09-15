@@ -18,19 +18,19 @@ The project was built incrementally, backend and frontend connected end to end, 
 ## Screenshots
 
 **Dashboard**
-![Dashboard](screenshots/dashboard.png)
+<img src="screenshots/dashboard.png" width="700" alt="Dashboard" />
 
 **Assets**
-![Dashboard](screenshots/assets.png)
+<img src="screenshots/assets.png" width="700" alt="Assets" />
 
 **Tickets**
-![Dashboard](screenshots/tickets.png)
+<img src="screenshots/tickets.png" width="700" alt="Tickets" />
 
 **Knowledge Base**
-![Dashboard](screenshots/knowledge-base.png)
+<img src="screenshots/knowledge-base.png" width="700" alt="Knowledge Base" />
 
 **Mobile view**
-![Dashboard](screenshots/mobile-view.png)
+<img src="screenshots/mobile-view.png" width="300" alt="Mobile view" />
 
 ## Features
 
