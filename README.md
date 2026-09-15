@@ -17,19 +17,24 @@ The project was built incrementally, backend and frontend connected end to end, 
 
 ## Screenshots
 
-**Dashboard**
+### Dashboard
+
 <img src="screenshots/dashboard.png" width="700" alt="Dashboard" />
 
-**Assets**
+### Assets
+
 <img src="screenshots/assets.png" width="700" alt="Assets" />
 
-**Tickets**
+### Tickets
+
 <img src="screenshots/tickets.png" width="700" alt="Tickets" />
 
-**Knowledge Base**
+### Knowledge Base
+
 <img src="screenshots/knowledge-base.png" width="700" alt="Knowledge Base" />
 
-**Mobile view**
+### Mobile view
+
 <img src="screenshots/mobile-view.png" width="300" alt="Mobile view" />
 
 ## Features
