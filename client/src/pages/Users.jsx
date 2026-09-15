@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import Badge from '../components/Badge'
+import Skeleton from '../components/Skeleton'
+import ErrorState from '../components/ErrorState'
 import { getAllUsers } from '../services/userService'
 
 function Users() {
@@ -10,18 +12,21 @@ function Users() {
   const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
-    async function loadUsers() {
-      try {
-        const data = await getAllUsers()
-        setUsers(data)
-      } catch (err) {
-        setError('Failed to load users. Is the backend server running?')
-      } finally {
-        setLoading(false)
-      }
-    }
     loadUsers()
   }, [])
+
+  async function loadUsers() {
+    try {
+      setLoading(true)
+      const data = await getAllUsers()
+      setUsers(data)
+      setError(null)
+    } catch (err) {
+      setError('Failed to load users. Is the backend server running?')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const filteredUsers = users.filter(
     (user) =>
@@ -29,8 +34,23 @@ function Users() {
       (user.department || '').toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  if (loading) return <p className="text-gray-500">Loading users...</p>
-  if (error) return <p className="text-red-600">{error}</p>
+  if (loading) {
+    return (
+      <div>
+        <Skeleton className="h-8 w-32 mb-6" />
+        <Skeleton className="h-10 w-full max-w-md mb-4" />
+        <div className="space-y-2">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-12 rounded-lg" />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return <ErrorState message={error} onRetry={loadUsers} />
+  }
 
   return (
     <div>
@@ -47,7 +67,27 @@ function Users() {
         />
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+      <div className="md:hidden space-y-3">
+        {filteredUsers.map((user) => (
+          <div key={user.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-medium text-gray-900">{user.name}</span>
+              <Badge>{user.role}</Badge>
+            </div>
+            <p className="text-sm text-gray-600 mb-1">{user.email}</p>
+            <p className="text-xs text-gray-500">{user.jobTitle} • {user.department}</p>
+            <p className="text-xs text-gray-400 mt-1">{user.employeeId}</p>
+          </div>
+        ))}
+
+        {filteredUsers.length === 0 && (
+          <div className="px-4 py-10 text-center text-gray-500 text-sm bg-white rounded-xl border border-gray-200">
+            No users match your search.
+          </div>
+        )}
+      </div>
+
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-gray-500">

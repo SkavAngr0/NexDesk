@@ -49,19 +49,19 @@ function Locations() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {locations.map((location) => (
-          <div key={location.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-            <div className="flex items-center gap-2 text-gray-900 font-semibold mb-1">
-              <MapPin size={18} className="text-blue-600" />
-              {location.name}
+          <div key={location.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 min-w-0">
+            <div className="flex items-center gap-2 text-gray-900 font-semibold mb-1 min-w-0">
+              <MapPin size={18} className="text-blue-600 shrink-0" />
+              <span className="truncate">{location.name}</span>
             </div>
-            <p className="text-xs text-gray-400 mb-4">{location.country}</p>
-            <div className="flex items-center gap-4 text-sm text-gray-500">
+            <p className="text-xs text-gray-400 mb-4 truncate">{location.country}</p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-500">
               <span className="flex items-center gap-1.5">
-                <Laptop size={16} />
+                <Laptop size={16} className="shrink-0" />
                 {location._count.assets} assets
               </span>
               <span className="flex items-center gap-1.5">
-                <Ticket size={16} />
+                <Ticket size={16} className="shrink-0" />
                 {location._count.tickets} tickets
               </span>
             </div>

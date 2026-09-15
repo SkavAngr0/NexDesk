@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Plus, Trash2 } from 'lucide-react'
+import { Search, Plus, Pencil, Trash2 } from 'lucide-react'
 import Badge from '../components/Badge'
 import Modal from '../components/Modal'
 import TicketForm from '../components/TicketForm'
@@ -18,6 +18,7 @@ function Tickets() {
   const [statusFilter, setStatusFilter] = useState('All')
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingTicket, setEditingTicket] = useState(null)
 
   useEffect(() => {
     loadTickets()
@@ -37,12 +38,22 @@ function Tickets() {
   }
 
   function openAddModal() {
+    setEditingTicket(null)
+    setIsModalOpen(true)
+  }
+
+  function openEditModal(ticket) {
+    setEditingTicket(ticket)
     setIsModalOpen(true)
   }
 
   async function handleFormSubmit(formData) {
     try {
-      await createTicket(formData)
+      if (editingTicket) {
+        await updateTicket(editingTicket.ticketNumber, formData)
+      } else {
+        await createTicket(formData)
+      }
       setIsModalOpen(false)
       loadTickets()
     } catch (err) {
@@ -147,7 +158,48 @@ function Tickets() {
         </select>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+      <div className="md:hidden space-y-3">
+        {filteredTickets.map((ticket) => (
+          <div key={ticket.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="font-medium text-gray-900">{ticket.ticketNumber}</span>
+              <Badge>{ticket.priority}</Badge>
+            </div>
+            <p className="text-sm text-gray-600 mb-1">{ticket.title}</p>
+            <p className="text-xs text-gray-500 mb-3">Requested by {ticket.requester?.name}</p>
+            <p className="text-xs text-gray-500 mb-3">
+              Technician: {ticket.technician?.name || 'Unassigned'}
+            </p>
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <select
+                value={ticket.status}
+                onChange={(e) => handleStatusChange(ticket.ticketNumber, e.target.value)}
+                className="text-xs border border-gray-300 rounded-md px-2 py-1"
+              >
+                {ticketStatuses.map((status) => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
+              <div className="flex items-center gap-3">
+                <button onClick={() => openEditModal(ticket)} className="text-blue-600">
+                  <Pencil size={16} />
+                </button>
+                <button onClick={() => handleDelete(ticket.ticketNumber)} className="text-red-600">
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {filteredTickets.length === 0 && (
+          <div className="px-4 py-10 text-center text-gray-500 text-sm bg-white rounded-xl border border-gray-200">
+            No tickets match your search or filters.
+          </div>
+        )}
+      </div>
+
+      <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-gray-200 text-left text-gray-500">
@@ -180,9 +232,14 @@ function Tickets() {
                 </td>
                 <td className="px-4 py-3 text-gray-600">{ticket.technician?.name || 'Unassigned'}</td>
                 <td className="px-4 py-3">
-                  <button onClick={() => handleDelete(ticket.ticketNumber)} className="text-gray-400 hover:text-red-600">
-                    <Trash2 size={16} />
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => openEditModal(ticket)} className="text-gray-400 hover:text-blue-600">
+                      <Pencil size={16} />
+                    </button>
+                    <button onClick={() => handleDelete(ticket.ticketNumber)} className="text-gray-400 hover:text-red-600">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -196,8 +253,16 @@ function Tickets() {
         )}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="New Ticket">
-        <TicketForm onSubmit={handleFormSubmit} onCancel={() => setIsModalOpen(false)} />
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingTicket ? 'Edit Ticket' : 'New Ticket'}
+      >
+        <TicketForm
+          initialData={editingTicket}
+          onSubmit={handleFormSubmit}
+          onCancel={() => setIsModalOpen(false)}
+        />
       </Modal>
     </div>
   )

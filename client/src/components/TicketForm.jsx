@@ -1,23 +1,37 @@
 import { useState, useEffect } from 'react'
-import { ticketCategories, ticketPriorities } from '../data/ticketOptions'
+import { ticketCategories, ticketPriorities, ticketStatuses } from '../data/ticketOptions'
 import { getAllUsers } from '../services/userService'
 
 function TicketForm({ initialData, onSubmit, onCancel }) {
   const [users, setUsers] = useState([])
+  const isEditing = Boolean(initialData)
+
   const [formData, setFormData] = useState(
-    initialData || {
-      title: '',
-      description: '',
-      category: '',
-      priority: '',
-      requesterId: '',
-    }
+    initialData
+      ? {
+          title: initialData.title,
+          description: initialData.description,
+          category: initialData.category,
+          priority: initialData.priority,
+          status: initialData.status,
+          requesterId: initialData.requesterId,
+          technicianId: initialData.technicianId || '',
+        }
+      : {
+          title: '',
+          description: '',
+          category: '',
+          priority: '',
+          requesterId: '',
+        }
   )
   const [errors, setErrors] = useState({})
 
   useEffect(() => {
     getAllUsers().then(setUsers).catch(() => setUsers([]))
   }, [])
+
+  const technicians = users.filter((u) => u.role === 'IT Technician' || u.role === 'Admin')
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -38,7 +52,9 @@ function TicketForm({ initialData, onSubmit, onCancel }) {
   function handleSubmit(e) {
     e.preventDefault()
     if (validate()) {
-      onSubmit(formData)
+      const payload = { ...formData }
+      if (payload.technicianId === '') payload.technicianId = null
+      onSubmit(payload)
     }
   }
 
@@ -100,6 +116,22 @@ function TicketForm({ initialData, onSubmit, onCancel }) {
         {errors.priority && <p className="text-xs text-red-600 mt-1">{errors.priority}</p>}
       </div>
 
+      {isEditing && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          >
+            {ticketStatuses.map((status) => (
+              <option key={status} value={status}>{status}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Requester</label>
         <select
@@ -115,6 +147,23 @@ function TicketForm({ initialData, onSubmit, onCancel }) {
         </select>
         {errors.requesterId && <p className="text-xs text-red-600 mt-1">{errors.requesterId}</p>}
       </div>
+
+      {isEditing && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Technician</label>
+          <select
+            name="technicianId"
+            value={formData.technicianId}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+          >
+            <option value="">Unassigned</option>
+            {technicians.map((tech) => (
+              <option key={tech.id} value={tech.id}>{tech.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="flex justify-end gap-3 pt-2">
         <button
